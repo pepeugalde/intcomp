@@ -57,7 +57,7 @@ if __name__ == '__main__':
     w = world.World()
     print w
     ox, oy, m = w.object
-    wx, wy, _, _ = w.win_area
+    wx, wy = w.win_area
     initsol = ((ox, oy), 
                m, 
                (wx, wy), 

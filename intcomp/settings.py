@@ -6,8 +6,8 @@ import cairo
 
 # Simulation window settings.
 SW_WIDTH = 640
-SW_HEIGHT = 480
-INTERVAL = 16
+SW_HEIGHT = 540
+INTERVAL = 150
 
 # Display widget settings.
 DW_WIDTH = 640
@@ -22,8 +22,8 @@ OBJ_HEIGHT = 24
 # Simulated Annealing
 SEG = 1
 STEPS = 300
-MAX_DISP_X = (2 * DW_WIDTH) / float(STEPS * SEG)
-MAX_DISP_Y = (2 * DW_HEIGHT) / float(STEPS * SEG)
+MAX_DISP_X = (0.75 * DW_WIDTH) / float(STEPS * SEG)
+MAX_DISP_Y = (0.75 * DW_HEIGHT) / float(STEPS * SEG)
 MIN_FORCE = 0
 MAX_FORCE = (MAX_MASS  * MAX_DISP_X) / (SEG * SEG)
 

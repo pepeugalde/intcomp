@@ -3,7 +3,8 @@ import random
 
 def prob(t, de):
     k = 1.380E-23
-    prob = -de / t
+    prob = math.exp(-de / t)
+    #print 'prob: %4f' % (prob)
     return prob
 
 def simann(initsol, ofunc, rfunc, (tinit, tmin, step)):
@@ -23,20 +24,21 @@ def simann(initsol, ofunc, rfunc, (tinit, tmin, step)):
     
     # Assess solution.
     solution = initsol
-    e1 = ofunc(solution)
-    solution_history.append((solution, e1))
+    e1 = best_energy
+    solution_history.append((t, solution, e1))
     # Search.
     while t > tmin:
         # Randomly tweak.
         new_solution = rfunc(solution, tinit, t)
         # Assess new solution.
         e2 = ofunc(new_solution)
-        # Record attempts.
-        solution_history.append((new_solution, e2))
         # Acceptance criteria.
         de = e2 - e1
-        print 'Solutions: %s -> %s, de: %s' % (e1, e2, de)
-        if de <= 0 or prob(t, de) < random.random():
+        print 'Solutions: %4f -> %4f, de: %4f' % (e1, e2, de)
+        p = prob(t, de) > random.random()
+        if de <= 0 or p:
+            # Record attempts.
+            solution_history.append((t, new_solution, e2))
             solution = new_solution
             e1 = e2
             if e2 < best_energy:
@@ -70,14 +72,8 @@ if __name__ == '__main__':
         Evaluate the final distance.
         '''
         ((ox, oy), m, (wx, wy), wf, (pxn, pxp, pyn, pyp)) = x
-        prop_f = (pxp - pxn, pyp - pyn) # Composite propulsion force.
-        
-        forces = [prop_f, wf]
-        (fx, fy) = reduce(lambda x, y: (x[0] + y[0], x[1] + y[1]), forces)
-        dx = ((fx * math.pow(settings.SEG, 2)) / m) * settings.STEPS
-        dy = ((fy * math.pow(settings.SEG, 2)) / m) * settings.STEPS
-
-        return aux.distance(ox + dx, oy + dy, ox, oy)
+        dx, dy = w.eval_sol(x)
+        return aux.distance(ox + dx, oy + dy, wx, wy)
 
     def rfunc(x, tinit, t):
         '''

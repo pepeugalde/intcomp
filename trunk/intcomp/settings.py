@@ -7,3 +7,6 @@ SW_HEIGHT = 480
 DW_WIDTH = 640
 DW_HEIGHT = 480
 
+
+#Object mass
+MAX_MASS = 1000

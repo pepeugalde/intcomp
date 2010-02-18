@@ -3,40 +3,27 @@ import sys
 import gtk
 import random
 import cairo
-import gobject
+import glib
 
 import settings
 import world
 
 class DisplayWidget(gtk.DrawingArea):
 
-    def __init__(self):
+    def __init__(self, world):
         super(DisplayWidget, self).__init__()
         self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(0, 0, 0))
         self.set_size_request(settings.DW_WIDTH, settings.DW_HEIGHT)
         self.connect("expose-event", self.expose)
-        self.init()
-
-    def update(self):
-        # World update.
-        self.world.update()
-        self.queue_draw()
-        return True
+        self.world = world
 
     def expose(self, widget, event):
         cr = widget.window.cairo_create()
-        if not self.paused:
-            # Clear screen.
-            cr.set_source_rgb(0, 0, 0)
-            cr.paint()
-            # Wolrd expose.
-            self.world.expose(cr)
-
-    def init(self):
-        self.paused = False
-        self.world = world.World()
-        gobject.timeout_add(settings.INTERVAL, self.update)
-        #glib.timeout_add(50, self.on_timer)
+        # Clear screen.
+        cr.set_source_rgb(0, 0, 0)
+        cr.paint()
+        # Wolrd expose.
+        self.world.expose(cr)
 
 
 class SimulationWindow(gtk.Window):
@@ -44,18 +31,26 @@ class SimulationWindow(gtk.Window):
     def __init__(self):
         super(SimulationWindow, self).__init__()
         
-        self.set_title('SISINT')
+        self.set_title('SISINT - Simulated Annealing')
         self.set_size_request(settings.SW_WIDTH, settings.SW_HEIGHT)
         self.set_resizable(False)
         self.set_position(gtk.WIN_POS_CENTER)
 
-        self.display_widget = DisplayWidget()
+        self.w = world.World()
+        self.display_widget = DisplayWidget(self.w)
         self.add(self.display_widget)
 
         self.connect("key-press-event", self.on_key_down)
         self.connect("destroy", gtk.main_quit)
+        glib.timeout_add(settings.INTERVAL, self.update)
 
         self.show_all()
 
+    def update(self):
+        self.w.update()
+        self.display_widget.queue_draw()
+
+        return True # Needed for glib.timeout_add
+
     def on_key_down(self, widget, event):
-        print 'poop'
+        self.w.randomize()

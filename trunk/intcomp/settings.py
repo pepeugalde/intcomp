@@ -40,5 +40,3 @@ IMG_OBJ = cairo.ImageSurface.create_from_png(RES_DIR + 'objective.png')
 IMG_OBJ_XOFF = 250
 IMG_OBJ_YOFF = 250
 IMG_BLK = cairo.ImageSurface.create_from_png(RES_DIR + 'block.png')
-IMG_BLK_XOFF = 12
-IMG_BLK_YOFF = 12

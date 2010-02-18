@@ -35,7 +35,7 @@ class DisplayWidget(gtk.DrawingArea):
     def init(self):
         self.paused = False
         self.world = world.World()
-        gobject.timeout_add(50, self.update)
+        gobject.timeout_add(settings.INTERVAL, self.update)
         #glib.timeout_add(50, self.on_timer)
 
 

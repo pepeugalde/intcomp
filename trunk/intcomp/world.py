@@ -1,5 +1,4 @@
 import random
-
 import settings
 
 
@@ -12,7 +11,27 @@ class World():
         pass
 
     def expose(self, cr):
-        pass
+        r, g, b, a =  (0, 65535, 65535, 0.5)
+        cr.set_source_rgba(r, g, b, a)
+        cr.rectangle((self.object[0] - settings.OBJ_WIDTH),
+                     (self.object[1] - settings.OBJ_HEIGHT),
+                     settings.OBJ_WIDTH,
+                     settings.OBJ_HEIGHT)
+        cr.fill()
+
+        cr.set_source_rgba(65535, 65535, 65535, 1)
+        
+        r, g, b, a =  (0, 65535, 65535, 0.5)
+        cr.set_source_rgba(r, g, b, a)
+        cr.rectangle((self.win_area[0] - self.win_area[2]),
+                    (self.win_area[1] - self.win_area[3]),
+                    self.win_area[2],
+                    self.win_area[3])
+        cr.fill()
+
+        cr.set_source_rgba(65535, 65535, 65535, 1)
+        
+
 
     def randomize(self):
         self.object = (settings.DW_WIDTH / 2, settings.DW_HEIGHT / 2,

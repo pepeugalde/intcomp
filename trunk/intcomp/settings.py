@@ -10,6 +10,8 @@ DW_HEIGHT = 480
 # Object data.
 MIN_MASS = 100
 MAX_MASS = 1000
+OBJ_WIDTH = 24
+OBJ_HEIGHT = 24
 
 # World data.
 MAX_WIND_FORCE = 100.0

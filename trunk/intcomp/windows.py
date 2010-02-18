@@ -36,9 +36,17 @@ class SimulationWindow(gtk.Window):
         self.set_resizable(False)
         self.set_position(gtk.WIN_POS_CENTER)
 
+        self.vbox = gtk.VBox(False, 0)
+
         self.w = world.World()
         self.display_widget = DisplayWidget(self.w)
-        self.add(self.display_widget)
+        self.vbox.add(self.display_widget)
+
+        self.start_button = gtk.Button('S T A R T')
+        self.start_button.connect("clicked", self.start)
+        self.vbox.add(self.start_button)
+
+        self.add(self.vbox)
 
         self.connect("key-press-event", self.on_key_down)
         self.connect("destroy", gtk.main_quit)
@@ -53,4 +61,8 @@ class SimulationWindow(gtk.Window):
         return True # Needed for glib.timeout_add
 
     def on_key_down(self, widget, event):
-        self.w.randomize()
+        #self.start(None)
+        pass
+
+    def start(self, b):
+        self.w.start_simann()

@@ -1,23 +1,22 @@
 import random
 import math
+import time
 
 import settings
 import aux
 import world
+import simann
+
 
 class World():
 
     def __init__(self):
-        self.running = False
         self.randomize()
-        self.message = 'Press (Enter) to start, (R) to restart.'
 
     def update(self):
-        if self.running:
-            pass
-        else:
-            pass
-            
+        if self.results:
+            ox, oy = self.results.pop()
+            self.object = (ox, oy, self.object[2])
         return True
 
     def expose(self, cr):
@@ -37,7 +36,7 @@ class World():
         cr.set_font_size(12)
         cr.set_source_rgb(65535, 65535, 65535)
         cr.move_to(12, 24)
-        cr.show_text('Simulated Annealing: ' + self.message)
+        cr.show_text('Simulated Annealing')
 
     def randomize(self):
         self.res = 0
@@ -64,14 +63,23 @@ class World():
                                                  self.friction, 
                                                  self.win_area)
 
-    def simann(self):
+    def eval_sol(self, x):
+        ((ox, oy), m, (wx, wy), wf, (pxn, pxp, pyn, pyp)) = x
+        prop_f = (pxp - pxn, pyp - pyn) # Composite propulsion force.
+        
+        forces = [prop_f, wf]
+        (fx, fy) = reduce(lambda x, y: (x[0] + y[0], x[1] + y[1]), forces)
+        return (((fx * math.pow(settings.SEG, 2)) / m) * settings.STEPS, 
+               ((fy * math.pow(settings.SEG, 2)) / m) * settings.STEPS)
+
+    def run_simann(self):
         ox, oy, m = self.object
         wx, wy = self.win_area
         initsol = ((ox, oy), 
                    m, 
                    (wx, wy), 
-                   w.wind_force, 
-                   w.propulsors)
+                   self.wind_force, 
+                   self.propulsors)
         print initsol
 
         def ofunc(x):
@@ -79,14 +87,8 @@ class World():
             Evaluate the final distance.
             '''
             ((ox, oy), m, (wx, wy), wf, (pxn, pxp, pyn, pyp)) = x
-            prop_f = (pxp - pxn, pyp - pyn) # Composite propulsion force.
-        
-            forces = [prop_f, wf]
-            (fx, fy) = reduce(lambda x, y: (x[0] + y[0], x[1] + y[1]), forces)
-            dx = ((fx * math.pow(settings.SEG, 2)) / m) * settings.STEPS
-            dy = ((fy * math.pow(settings.SEG, 2)) / m) * settings.STEPS
-
-            return aux.distance(ox + dx, oy + dy, ox, oy)
+            dx, dy = self.eval_sol(x)
+            return aux.distance(ox + dx, oy + dy, wx, wy)
 
         def rfunc(x, tinit, t):
             '''
@@ -108,7 +110,23 @@ class World():
                                     settings.MAX_FORCE)))
 
         sched = (100, 0.0, 0.001)
-        return simann(initsol, ofunc, rfunc, sched)
+        return simann.simann(initsol, ofunc, rfunc, sched)
+
+    def start_simann(self):
+        (best_solution, best_energy, solution_history) = self.run_simann()
+        f = open('out', 'w')
+        for (t, sol, e) in solution_history + [(None, best_solution, None)]:
+            ((ox, oy), m, (wx, wy), wf, (pxn, pxp, pyn, pyp)) = sol
+            dx, dy = self.eval_sol(sol)
+            self.results.append((ox + dx, oy + dy))
+            if t and e:
+                f.write('%s %s\n' % (t, e))
+        tmp = random.sample(self.results, 99)
+        tmp.append(self.results[-1])
+        tmp.reverse()
+        self.results = tmp
+        print 'Best solution:\n\t%s energy: %s' % (best_solution, best_energy)
+        print 'Animating...'
 
 
 if __name__ == '__main__':

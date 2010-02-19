@@ -3,7 +3,7 @@ import math
 import time
 
 import settings
-import aux
+import calc
 import world
 import simann
 
@@ -88,7 +88,7 @@ class World():
             '''
             ((ox, oy), m, (wx, wy), wf, (pxn, pxp, pyn, pyp)) = x
             dx, dy = self.eval_sol(x)
-            return aux.distance(ox + dx, oy + dy, wx, wy)
+            return calc.distance(ox + dx, oy + dy, wx, wy)
 
         def rfunc(x, tinit, t):
             '''

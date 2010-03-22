@@ -31,6 +31,7 @@ p = None
 next = False
 continuous = False
 trajectories = False
+restart = False
 
 def display():
     global xrot, yrot, p, trajectories
@@ -69,13 +70,20 @@ def resize(w, h):
     set_camera()
 
 def key_cb (key, x, y):
-    global next, continuous, trajectories
+    global next, continuous, trajectories, restart
+    global zoom, ZOOM_RATE
     if key == 'n' or key == 'N':
         next = True
     elif key == 'c' or key == 'C':
         continuous = not continuous
     elif key == 'v' or key == 'V':
         trajectories = not trajectories
+    elif key == 'b' or key == 'B':
+        restart = True
+    elif key == '-':
+        zoom += ZOOM_RATE
+    elif key == '+':
+        zoom -= ZOOM_RATE
 
 def mouse(button, state, x, y):
     global mouseDown, xrot, yrot, xdiff, ydiff
@@ -96,14 +104,19 @@ def mouse_motion(x, y):
         xrot = (y + ydiff)
 
 def update(value):
-    global zoom, depth, p, next, continuous
+    global zoom, depth, p, next, continuous, restart
 
     if zoom:
         depth += zoom
         zoom = 0.0
         set_camera()
 
-    if next or continuous:
+    if restart:
+        p.setup()
+        print '\nWorld data:\n{0}'.format(p)
+        restart = False
+        next = False
+    elif next or continuous:
         p.step()
         next = False
 
@@ -118,6 +131,7 @@ def init():
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
     p = projectile.ProjectileEvaluator()
+    print 'World data:\n{0}'.format(p)
 
 if __name__ == '__main__':
     import sys

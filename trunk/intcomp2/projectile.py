@@ -16,9 +16,12 @@ from genea import genea, get_top
 class ProjectileEvaluator:
 
     def __init__(self):
-        self.distance = random.randint(50, 150)
+        self.setup()
+
+    def setup(self):
+        self.distance = random.uniform(25.0, 175.0)
         self.gravity = random.uniform(5.0, 400.0)
-        self.ty = random.randint(25, 200)
+        self.ty = random.uniform(10.0, 200.0)
         self.population = 36
         self.init_genea()
 
@@ -137,13 +140,19 @@ class ProjectileEvaluator:
             rot += 360.0 / self.population
             glPopMatrix()
 
+    def __str__(self):
+        return ('Distance: {0:5.2f}m\nG: {1:5.2f}m/s2\n' + 
+                'Ty: {2:5.2f}m').format(self.distance, 
+                                      self.gravity, 
+                                      self.ty)
+
+    def __repr__(self):
+        return self.__str__()
+
 
 if __name__ == '__main__':
     p = ProjectileEvaluator()
-    print 'Distance: {0}\nG: {1}\nTy: {2}'.format(p.distance, 
-                                                  p.gravity, 
-                                                  p.ty)
-
+    print p
     while True:
         for e in p.evalt:
             ang_rad, vox, voy, t, f = p.evaluate_individual(e[0])

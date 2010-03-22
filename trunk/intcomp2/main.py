@@ -19,7 +19,7 @@ ZOOM_RATE = 3.0
 
 # ----- VARIABLES -----
 depth = DEPTH
-zoom = 0.0;
+zoom = 0.0
 
 mouseDown = False
 xrot = 0.0

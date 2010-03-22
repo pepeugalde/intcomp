@@ -75,7 +75,8 @@ class ProjectileEvaluator:
             pts = [(vox * i * td, f(i * td)) for i in range(0, 100)]
             self.tank_list.append((ang_rad * (180.0 / math.pi), 
                                    pts, 
-                                   e[0] == top[0]))
+                                   e[0] == top[0],
+                                   (vox, voy)))
 
     def step(self):
         self.evalt = self.next_func(self.evalt)
@@ -103,8 +104,8 @@ class ProjectileEvaluator:
             glutSolidSphere(1.0, 20, 20)
             glPopMatrix()
 
-        def display_tank(ang):
-            glColor4d (0.0, 1.0, 0.0, 0.5)
+        def display_tank(ang, (vx, vy)):
+            glColor4d (0.0, 1.0, 1-(vy/512 + vy/512), 0.5)
             glutSolidSphere(2.0, 20, 20)
             glPushMatrix()
             glRotated(ang, 1, 0, 0)
@@ -128,11 +129,11 @@ class ProjectileEvaluator:
         display_target()
 
         rot = 0.0
-        for ang, pts, t in self.tank_list:
+        for ang, pts, t, vels in self.tank_list:
             glPushMatrix()
             glRotated(rot, 0, 1, 0)
             glTranslated(0.0, 0.0, self.distance)
-            display_tank(ang)
+            display_tank(ang, vels)
             if trajectories:
                 display_lines(pts, t)
             #glColor4d (1.0, 0.0, 0.0, 1.0)

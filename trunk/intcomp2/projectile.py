@@ -2,11 +2,11 @@ import random
 import math
 
 try:
-  from OpenGL.GLUT import *
-  from OpenGL.GL import *
-  from OpenGL.GLU import *
+    from OpenGL.GLUT import *
+    from OpenGL.GL import *
+    from OpenGL.GLU import *
 except:
-  print '''
+    print '''
 ERROR: PyOpenGL not installed properly.  
         '''
 
@@ -15,14 +15,14 @@ from genea import genea, get_top
 
 class ProjectileEvaluator:
 
-    def __init__(self):
-        self.setup()
+    def __init__(self, population = 36):
+        self.setup(population)
 
-    def setup(self):
+    def setup(self, p = 36):
         self.distance = random.uniform(25.0, 175.0)
         self.gravity = random.uniform(5.0, 400.0)
         self.ty = random.uniform(10.0, 200.0)
-        self.population = 36
+        self.population = p
         self.init_genea()
 
     def evaluate_individual(self, x):
@@ -152,12 +152,28 @@ class ProjectileEvaluator:
 
 
 if __name__ == '__main__':
-    p = ProjectileEvaluator()
-    print p
-    while True:
+    import sys, math
+
+    f = lambda x: abs(x) -1 if x % 2 else abs(x)
+    p = ProjectileEvaluator(population = f(int(sys.argv[1])))
+    print p, '\n'
+
+    sumf = 0.0
+    for i in range(0, abs(int(sys.argv[2]))):
+        top = get_top(p.evalt)
         for e in p.evalt:
             ang_rad, vox, voy, t, f = p.evaluate_individual(e[0])
             error = abs(p.ty - f(t))
-            print '[{0}] error: {1}'.format(''.join(e[0]), error)
+            sumf += e[1]
+            print ('[{0}]{4} error: {1:5.3f} ' + 
+                   'f: {2:5.3f} ps: {3:5.3f}').format(''.join(e[0]), 
+                                                      error,
+                                                      e[1],
+                                                      e[2],
+                                                      '*' if e[0] == top[0]
+                                                      else ' ')
+        print ('Fitness sum: {0:5.3f}\n' + 
+               'Avg. fitness: {1:5.3f}').format(sumf,
+                                                sumf / p.population)
         print '\n-------------------------\n'
         p.step()

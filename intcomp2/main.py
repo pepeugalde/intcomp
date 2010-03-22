@@ -1,9 +1,9 @@
 try:
-  from OpenGL.GLUT import *
-  from OpenGL.GL import *
-  from OpenGL.GLU import *
+    from OpenGL.GLUT import *
+    from OpenGL.GL import *
+    from OpenGL.GLU import *
 except:
-  print '''
+    print '''
 ERROR: PyOpenGL not installed properly.  
         '''
 
@@ -28,10 +28,12 @@ xdiff = 0.0
 ydiff = 0.0
 
 p = None
+next = False
+continuous = False
+trajectories = False
 
-
-def display ():
-    global xrot, yrot, p
+def display():
+    global xrot, yrot, p, trajectories
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
@@ -42,7 +44,7 @@ def display ():
     glRotated(xrot, 1.0, 0.0, 0.0)
     glRotated(yrot, 0.0, 1.0, 0.0)
 
-    p.display()
+    p.display(trajectories)
 
     glPopMatrix()
 
@@ -66,6 +68,15 @@ def resize(w, h):
     glLoadIdentity()
     set_camera()
 
+def key_cb (key, x, y):
+    global next, continuous, trajectories
+    if key == 'n' or key == 'N':
+        next = True
+    elif key == 'c' or key == 'C':
+        continuous = not continuous
+    elif key == 'v' or key == 'V':
+        trajectories = not trajectories
+
 def mouse(button, state, x, y):
     global mouseDown, xrot, yrot, xdiff, ydiff
 
@@ -85,12 +96,16 @@ def mouse_motion(x, y):
         xrot = (y + ydiff)
 
 def update(value):
-    global zoom, depth
+    global zoom, depth, p, next, continuous
 
     if zoom:
         depth += zoom
         zoom = 0.0
         set_camera()
+
+    if next or continuous:
+        p.step()
+        next = False
 
     glutPostRedisplay()
     glutTimerFunc(INTERVAL, update, 0)
@@ -112,10 +127,11 @@ if __name__ == '__main__':
 
     glutInitWindowSize(WIDTH, HEIGHT)
     glutInitWindowPosition(0, 0)
-    glutCreateWindow("TEMPLATE")
+    glutCreateWindow("GENETIC ALGORITHM")
 
     init()
 
+    glutKeyboardFunc(key_cb)
     glutMouseFunc(mouse)
     glutMotionFunc(mouse_motion)
     glutDisplayFunc(display)

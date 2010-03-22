@@ -16,9 +16,9 @@ from genea import genea, get_top
 class ProjectileEvaluator:
 
     def __init__(self):
-        self.distance = random.randint(100, 150)
-        self.gravity = random.uniform(5.0, 15.0)
-        self.ty = random.randint(25, 100)
+        self.distance = random.randint(50, 150)
+        self.gravity = random.uniform(5.0, 400.0)
+        self.ty = random.randint(25, 200)
         self.population = 36
         self.init_genea()
 
@@ -68,21 +68,22 @@ class ProjectileEvaluator:
         top = get_top(self.evalt)
         for e in self.evalt:
             ang_rad, vox, voy, t, f = self.evaluate_individual(e[0])
-            td = t * 2 / 10.0
-            pts = [(vox * i * td, f(i * td)) for i in range(1, 10)]
+            td = (t * 2) / 100.0
+            pts = [(vox * i * td, f(i * td)) for i in range(0, 100)]
             self.tank_list.append((ang_rad * (180.0 / math.pi), 
                                    pts, 
                                    e[0] == top[0]))
 
     def step(self):
         self.evalt = self.next_func(self.evalt)
+        self.get_data(self.evalt)
 
-    def display(self):
+    def display(self, trajectories):
         def display_area():
             glPushMatrix()
 
             glTranslated(0.0, -5.0, 0.0)
-            glColor4d (1.0, 1.0, 0.0, 1.0)
+            glColor4d (0.25, 0.125, 0.0, 1.0)
             glBegin(GL_QUADS)
             glVertex3d(200.0, 0, -200.0)
             glVertex3d(-200.0, 0, -200.0)
@@ -95,41 +96,44 @@ class ProjectileEvaluator:
         def display_target(t = 0.5):
             glPushMatrix()
             glTranslated(0.0, self.ty, 0.0)
-            glScaled(1.0, 2.0, 1.0)
-            glColor4d(1.0, 1.0, 1.0, t)
-            glutSolidCube(5.0)
-            glTranslated(0.0, -5.0, 0.0)
-            glColor4d(1.0, 0.0, 0.0, t)
-            glutSolidCube(5.0)
-            glTranslated(0.0, -5.0, 0.0)
-            glColor4d(1.0, 1.0, 1.0, t)
-            glutSolidCube(5.0)
+            glColor4d (1.0, 1.0, 0.0, 1.0)
+            glutSolidSphere(1.0, 20, 20)
             glPopMatrix()
 
         def display_tank(ang):
-            glColor4d (0.0, 1.0, 0.0, 1.0)
-            glutSolidSphere(5.0, 20, 20)
+            glColor4d (0.0, 1.0, 0.0, 0.5)
+            glutSolidSphere(2.0, 20, 20)
             glPushMatrix()
             glRotated(ang, 1, 0, 0)
-            glTranslated(0.0, 0.0, -10.0)
-            glScaled(1.0, 1.0, 10.0)
-            glutSolidCube(2.0)
+            glTranslated(0.0, 0.0, -5.0)
+            glScaled(1.0, 1.0, 5.0)
+            glutSolidCube(1.0)
             glPopMatrix()
 
         def display_lines(pts, top):
-            pass
+            if top:
+                glColor4d (1.0, 0.0, 0.0, 1.0)
+            else:
+                glColor4d (1.0, 1.0, 1.0, 0.5)
+            glBegin(GL_LINE_STRIP)
+            for z, y in pts:
+                glVertex3d(0.0, y, -z)
+            glEnd()
+                
 
         display_area()
         display_target()
 
-        
         rot = 0.0
         for ang, pts, t in self.tank_list:
             glPushMatrix()
             glRotated(rot, 0, 1, 0)
             glTranslated(0.0, 0.0, self.distance)
             display_tank(ang)
-            display_lines(pts, t)
+            if trajectories:
+                display_lines(pts, t)
+            #glColor4d (1.0, 0.0, 0.0, 1.0)
+            #glutSolidCube(10.0)
             rot += 360.0 / self.population
             glPopMatrix()
 
